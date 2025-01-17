@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { GET_POKEMON } from '../../../../graphql/queries';
 import { PokemonData } from '../../../../graphql/types';
 import { redirect } from 'next/navigation';
-import { Metadata, ResolvingMetadata } from 'next';
+import { Metadata } from 'next';
 import Home from '../../page';
 
 // Initialize Apollo Client for server-side operations
@@ -11,17 +11,16 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-type Props = {
-  params: { name: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+interface Props {
+  params: Promise<{ name: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata for SEO
 export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
+  { params }: Props
 ): Promise<Metadata> {
-  const name = await Promise.resolve(params.name);
+  const { name } = await params;
 
   return {
     title: `${name} - Pokemon Info`,
@@ -69,7 +68,7 @@ export async function generateStaticParams() {
 }
 
 export default async function PokemonPage({ params }: Props) {
-  const pokemonName = await Promise.resolve(params.name);
+  const { name: pokemonName } = await params;
   
   try {
     // Server-side data fetching
@@ -84,7 +83,7 @@ export default async function PokemonPage({ params }: Props) {
 
     // Return the client-side Home component with the pre-fetched name
     return <Home initialPokemon={pokemonName} />;
-  } catch (error) {
+  } catch {
     redirect('/?error=not_found&name=' + encodeURIComponent(pokemonName));
   }
 }
