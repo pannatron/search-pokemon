@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
-import { useCallback, memo } from 'react';
+import { useQuery, useApolloClient } from '@apollo/client';
+import { useCallback, memo, useEffect } from 'react';
 import Image from 'next/image';
 import { GET_POKEMON } from '../graphql/queries';
 import { Attack, Evolution, PokemonData, PokemonVars } from '../graphql/types';
@@ -10,22 +10,41 @@ import { getTypeColor } from '../utils/typeColors';
 interface PokemonInfoProps {
   name: string;
   onSelectEvolution: (name: string) => void;
+  initialData?: PokemonData;
 }
 
-const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
+const PokemonInfo = ({ name, onSelectEvolution, initialData }: PokemonInfoProps) => {
+  const client = useApolloClient();
+  
+  const { data, loading, error } = useQuery<PokemonData, PokemonVars>(GET_POKEMON, {
+    variables: { name },
+    onError: (err) => {
+      console.error('Pokemon query error:', err);
+    },
+    skip: !!initialData // Skip the query if we have initial data
+  });
+
+  // Use initialData if available, otherwise use query data
+  const pokemonData = initialData || data;
+
+  // Pre-fetch evolution data
+  useEffect(() => {
+    if (pokemonData?.pokemon?.evolutions) {
+      pokemonData.pokemon.evolutions.forEach((evo: Evolution) => {
+        client.query({
+          query: GET_POKEMON,
+          variables: { name: evo.name.toLowerCase() },
+        });
+      });
+    }
+  }, [pokemonData?.pokemon?.evolutions, client]);
+
   const handleEvolutionClick = useCallback((evoName: string) => {
+    // Data should already be in cache from pre-fetch
     onSelectEvolution(evoName);
   }, [onSelectEvolution]);
 
-  const { data, loading, error } = useQuery<PokemonData, PokemonVars>(GET_POKEMON, {
-    variables: { name },
-    fetchPolicy: 'network-only',
-    onError: (error) => {
-      console.error('Pokemon query error:', error);
-    }
-  });
-
-  if (loading) return (
+  if (loading && !initialData) return (
     <div className="p-8 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 max-w-[1200px] mx-auto shadow-glow">
       <div className="animate-pulse flex gap-8">
         <div className="w-48 shrink-0">
@@ -41,7 +60,7 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
     </div>
   );
   
-  if (error || (!loading && !data?.pokemon)) {
+  if ((error && !initialData) || (!loading && !pokemonData?.pokemon)) {
     return (
       <div className="p-8 bg-gray-800/30 backdrop-blur-lg rounded-2xl border-2 border-red-500/30 max-w-[1200px] mx-auto shadow-glow">
         <div className="text-center space-y-4">
@@ -52,7 +71,7 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
     );
   }
 
-  const pokemon = data!.pokemon!;
+  const pokemon = pokemonData!.pokemon!;
 
   return (
     <div className="p-8 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 max-w-[1200px] mx-auto shadow-glow">
