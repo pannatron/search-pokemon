@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import Home from '../../page';
 
 // Import and use the configured Apollo client
-import client from '../../../../graphql/client';
+import { getClient } from '../../../../graphql/client';
 
 interface Props {
   params: Promise<{ name: string }>;
@@ -68,7 +68,7 @@ export default async function PokemonPage({ params }: Props) {
   
   try {
     // Server-side data fetching
-    const { data } = await client.query<PokemonData>({
+    const { data } = await getClient().query<PokemonData>({
       query: GET_POKEMON,
       variables: { name: pokemonName },
     });
@@ -77,8 +77,8 @@ export default async function PokemonPage({ params }: Props) {
       redirect('/?error=not_found&name=' + encodeURIComponent(pokemonName));
     }
 
-    // Return the client-side Home component with the pre-fetched name
-    return <Home initialPokemon={pokemonName} />;
+    // Return the client-side Home component with the pre-fetched data
+    return <Home initialPokemon={pokemonName} initialData={data} />;
   } catch {
     redirect('/?error=not_found&name=' + encodeURIComponent(pokemonName));
   }
