@@ -21,7 +21,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const name = params.name;
+  const name = await Promise.resolve(params.name);
 
   return {
     title: `${name} - Pokemon Info`,
@@ -69,20 +69,22 @@ export async function generateStaticParams() {
 }
 
 export default async function PokemonPage({ params }: Props) {
+  const pokemonName = await Promise.resolve(params.name);
+  
   try {
     // Server-side data fetching
     const { data } = await client.query<PokemonData>({
       query: GET_POKEMON,
-      variables: { name: params.name },
+      variables: { name: pokemonName },
     });
 
     if (!data.pokemon) {
-      redirect('/?error=not_found&name=' + encodeURIComponent(params.name));
+      redirect('/?error=not_found&name=' + encodeURIComponent(pokemonName));
     }
 
     // Return the client-side Home component with the pre-fetched name
-    return <Home initialPokemon={params.name} />;
+    return <Home initialPokemon={pokemonName} />;
   } catch (error) {
-    redirect('/?error=not_found&name=' + encodeURIComponent(params.name));
+    redirect('/?error=not_found&name=' + encodeURIComponent(pokemonName));
   }
 }
