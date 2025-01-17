@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
+import { useCallback, memo } from 'react';
 import { GET_POKEMON } from '../graphql/queries';
 import { FastAttack, Evolution } from '../graphql/types';
 
@@ -10,6 +11,9 @@ interface PokemonInfoProps {
 }
 
 const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
+  const handleEvolutionClick = useCallback((evoName: string) => {
+    onSelectEvolution(evoName);
+  }, [onSelectEvolution]);
   const { data, loading, error } = useQuery(GET_POKEMON, {
     variables: { name },
   });
@@ -49,7 +53,7 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
               >
                 <span 
                   className="text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
-                  onClick={() => onSelectEvolution(evo.name)}
+                  onClick={() => handleEvolutionClick(evo.name)}
                 >
                   {evo.name}
                 </span>
@@ -64,4 +68,4 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
   );
 };
 
-export default PokemonInfo;
+export default memo(PokemonInfo);
