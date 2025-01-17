@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import SearchBox from '../../components/SearchBox';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import SearchParamsWrapper from '../../components/SearchParamsWrapper';
 
 const PokemonInfo = dynamic(() => import('../../components/PokemonInfo'), {
   ssr: false,
@@ -36,10 +38,13 @@ interface HomeProps {
 
 export default function Home({ initialPokemon }: HomeProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [searchedPokemon, setSearchedPokemon] = useState<string | null>(
-    initialPokemon || searchParams.get('name')
-  );
+  const [searchedPokemon, setSearchedPokemon] = useState<string | null>(initialPokemon || null);
+  
+  const handleSearchParams = useCallback((name: string | null) => {
+    if (!searchedPokemon) {
+      setSearchedPokemon(name);
+    }
+  }, [searchedPokemon]);
   
   // Initialize history from sessionStorage
   const [history, setHistory] = useState<string[]>(() => {
@@ -95,10 +100,10 @@ export default function Home({ initialPokemon }: HomeProps) {
     <div className="flex-1">
       <SearchBox 
         onSearch={handleSearch} 
-        initialValue={searchParams.get('name') || initialPokemon || ''} 
+        initialValue={searchedPokemon || initialPokemon || ''} 
       />
     </div>
-  ), [handleSearch, searchParams, initialPokemon]);
+  ), [handleSearch, searchedPokemon, initialPokemon]);
 
   // Render back button without memoization to ensure consistent hydration
   const backButton = history.length > 0 ? (
@@ -124,6 +129,8 @@ export default function Home({ initialPokemon }: HomeProps) {
   ) : null;
 
   return (
+    <>
+    <SearchParamsWrapper onSearchParams={handleSearchParams} />
     <main className="min-h-screen">
       <div className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="text-center mb-16 space-y-6 animate-float">
@@ -148,10 +155,12 @@ export default function Home({ initialPokemon }: HomeProps) {
         {!searchedPokemon ? (
           <div className="text-center py-16 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 shadow-glow transition-all duration-300 hover:shadow-glow-lg">
             <div className="max-w-md mx-auto">
-              <img 
+              <Image 
                 src="/pokeball.png" 
                 alt="Pokeball" 
-                className="w-32 h-32 mx-auto mb-8 opacity-50 animate-float"
+                width={128}
+                height={128}
+                className="mx-auto mb-8 opacity-50 animate-float"
               />
               <p className="text-xl text-gray-300 font-medium">
                 Enter a Pokémon name above to see detailed information
@@ -174,10 +183,8 @@ export default function Home({ initialPokemon }: HomeProps) {
             >
               <div className="text-center p-6 bg-gray-800/50 backdrop-blur-lg rounded-xl border border-red-500/30 shadow-glow">
                 <h2 className="text-2xl font-semibold text-red-400 mb-3">
-                  ไม่พบโปเกม่อน
                 </h2>
                 <p className="text-lg text-gray-300">
-                  กรุณาลองค้นหาใหม่อีกครั้ง
                 </p>
               </div>
             </div>
@@ -192,5 +199,6 @@ export default function Home({ initialPokemon }: HomeProps) {
         }
       `}</style>
     </main>
+    </>
   );
 }
