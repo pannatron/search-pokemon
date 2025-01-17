@@ -31,8 +31,8 @@ const SearchBox = ({ onSearch, initialValue }: SearchBoxProps) => {
   }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit} className="mb-6 w-full max-w-2xl mx-auto">
+      <div className="flex gap-3">
         <input
           type="text"
           value={searchTerm}
@@ -40,11 +40,19 @@ const SearchBox = ({ onSearch, initialValue }: SearchBoxProps) => {
           placeholder="Enter Pokémon name (e.g., Pikachu)"
           maxLength={20}
           aria-label="Pokémon name search"
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-3 bg-gray-800/50 text-white placeholder-gray-400 
+                     border border-primary-purple/30 rounded-lg 
+                     focus:outline-none focus:border-primary-purple focus:ring-2 
+                     focus:ring-primary-pink/50 transition-all duration-300
+                     shadow-glow-sm hover:shadow-glow"
         />
         <button
           type="submit"
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-8 py-3 bg-gradient-to-r from-primary-purple to-primary-pink 
+                     text-white font-semibold rounded-lg transition-all duration-300
+                     hover:shadow-glow hover:-translate-y-1
+                     focus:outline-none focus:ring-2 focus:ring-primary-pink/50
+                     bg-[length:200%_auto] hover:bg-right-top animate-shine"
         >
           Search
         </button>
