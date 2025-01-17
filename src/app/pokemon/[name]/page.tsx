@@ -1,15 +1,11 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { GET_POKEMON } from '../../../../graphql/queries';
 import { PokemonData } from '../../../../graphql/types';
 import { redirect } from 'next/navigation';
 import { Metadata } from 'next';
 import Home from '../../page';
 
-// Initialize Apollo Client for server-side operations
-const client = new ApolloClient({
-  uri: 'https://graphql-pokemon2.vercel.app/',
-  cache: new InMemoryCache(),
-});
+// Import and use the configured Apollo client
+import client from '../../../../graphql/client';
 
 interface Props {
   params: Promise<{ name: string }>;
