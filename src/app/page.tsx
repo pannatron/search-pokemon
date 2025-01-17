@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import SearchParamsWrapper from '../../components/SearchParamsWrapper';
 
 const PokemonInfo = dynamic(() => import('../../components/PokemonInfo'), {
-  ssr: false,
   loading: () => (
     <div className="p-6 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 max-w-[1200px] mx-auto shadow-glow">
       <div className="animate-pulse flex flex-col lg:flex-row gap-6">
@@ -32,11 +31,14 @@ const PokemonInfo = dynamic(() => import('../../components/PokemonInfo'), {
   ),
 });
 
+import { PokemonData } from '../../graphql/types';
+
 interface HomeProps {
   initialPokemon?: string;
+  initialData?: PokemonData;
 }
 
-export default function Home({ initialPokemon }: HomeProps) {
+export default function Home({ initialPokemon, initialData }: HomeProps) {
   const router = useRouter();
   const [searchedPokemon, setSearchedPokemon] = useState<string | null>(initialPokemon || null);
   
@@ -171,7 +173,8 @@ export default function Home({ initialPokemon }: HomeProps) {
           <div className="relative backdrop-blur-sm">
             <PokemonInfo 
               key={searchedPokemon} // Force remount on new search
-              name={searchedPokemon} 
+              name={searchedPokemon}
+              initialData={initialData}
               onSelectEvolution={handleSearch} 
             />
             <div 
