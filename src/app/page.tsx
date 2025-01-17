@@ -139,7 +139,7 @@ export default function Home({ initialPokemon, initialData }: HomeProps) {
           <div className="relative inline-block">
             <div className="absolute -inset-1 bg-gradient-to-r from-primary-purple to-primary-pink rounded-2xl blur opacity-25 group-hover:opacity-40 transition-all duration-300 animate-pulse"></div>
             <h1 className="relative text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-purple to-primary-pink animate-shine">
-              Search Pokémon
+              Search Pokém<Image src="/ball.gif" alt="o" width={72} height={72} className="inline-block" />n
             </h1>
           </div>
           <p className="text-gray-300 text-xl font-medium">
