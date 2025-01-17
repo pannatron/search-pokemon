@@ -3,7 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { useCallback, memo } from 'react';
 import { GET_POKEMON } from '../graphql/queries';
-import { FastAttack, Evolution } from '../graphql/types';
+import { FastAttack, Evolution, PokemonData, PokemonVars } from '../graphql/types';
 
 interface PokemonInfoProps {
   name: string;
@@ -14,15 +14,43 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
   const handleEvolutionClick = useCallback((evoName: string) => {
     onSelectEvolution(evoName);
   }, [onSelectEvolution]);
-  const { data, loading, error } = useQuery(GET_POKEMON, {
+  const { data, loading, error } = useQuery<PokemonData, PokemonVars>(GET_POKEMON, {
     variables: { name },
+    // Ensure we get fresh data and handle errors appropriately
+    fetchPolicy: 'network-only',
+    onError: (error) => {
+      console.error('Pokemon query error:', error);
+    }
   });
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  if (!data?.pokemon) return <p>Pokemon not found!</p>;
+  if (loading) return (
+    <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
+      <div className="animate-pulse space-y-4">
+        <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        <div className="space-y-3">
+          <div className="h-4 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded"></div>
+          <div className="h-4 bg-gray-200 rounded"></div>
+        </div>
+          <div className="text-center text-gray-500">Loading...</div>
+      </div>
+    </div>
+  );
+  
+  if (error || (!loading && !data?.pokemon)) {
+    return (
+      <div className="p-4 max-w-md mx-auto bg-white rounded-xl shadow-md border-2 border-red-200">
+        <div className="text-center">
+          <p className="text-lg text-gray-800">
+            Pokemon name "{name}" not found
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  const { pokemon } = data;
+  const pokemon = data!.pokemon!;
 
   return (
     <div className="p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
@@ -49,14 +77,11 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
           <ul className="space-y-1">
             {pokemon.evolutions.map((evo: Evolution) => (
               <li 
-                key={evo.name} 
+                key={evo.name}
+                className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                onClick={() => handleEvolutionClick(evo.name)}
               >
-                <span 
-                  className="text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
-                  onClick={() => handleEvolutionClick(evo.name)}
-                >
-                  {evo.name}
-                </span>
+                {evo.name}
               </li>
             ))}
           </ul>
