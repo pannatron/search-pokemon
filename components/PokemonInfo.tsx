@@ -2,6 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { useCallback, memo } from 'react';
+import Image from 'next/image';
 import { GET_POKEMON } from '../graphql/queries';
 import { Attack, Evolution, PokemonData, PokemonVars } from '../graphql/types';
 import { getTypeColor } from '../utils/typeColors';
@@ -45,7 +46,7 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
       <div className="p-8 bg-gray-800/30 backdrop-blur-lg rounded-2xl border-2 border-red-500/30 max-w-[1200px] mx-auto shadow-glow">
         <div className="text-center space-y-4">
           <h2 className="text-lg font-semibold text-red-400">Pokemon Not Found</h2>
-          <p className="text-gray-300">No Pokemon found with the name "{name}"</p>
+          <p className="text-gray-300">No Pokemon found with the name &quot;{name}&quot;</p>
         </div>
       </div>
     );
@@ -62,9 +63,11 @@ const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary-purple to-primary-pink rounded-2xl blur opacity-25 group-hover:opacity-70 transition-all duration-300 animate-pulse"></div>
               <div className="relative">
-                <img 
+                <Image 
                   src={pokemon.image} 
                   alt={pokemon.name}
+                  width={320}
+                  height={320}
                   className="w-full h-auto rounded-xl shadow-glow mb-6 transform group-hover:scale-105 transition-all duration-300"
                 />
               </div>
