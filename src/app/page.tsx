@@ -7,6 +7,27 @@ import { useSearchParams, useRouter } from 'next/navigation';
 
 const PokemonInfo = dynamic(() => import('../../components/PokemonInfo'), {
   ssr: false,
+  loading: () => (
+    <div className="p-6 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 max-w-[1200px] mx-auto shadow-glow">
+      <div className="animate-pulse flex flex-col lg:flex-row gap-6">
+        <div className="lg:w-1/4">
+          <div className="aspect-square bg-gray-700/50 rounded-xl mb-4"></div>
+          <div className="h-8 bg-gray-700/50 rounded-lg w-3/4 mx-auto mb-4"></div>
+        </div>
+        <div className="lg:w-3/4">
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex gap-4">
+                {[1, 2, 3].map((j) => (
+                  <div key={j} className="flex-1 h-8 bg-gray-700/50 rounded"></div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
 });
 
 interface HomeProps {
@@ -83,62 +104,91 @@ export default function Home({ initialPokemon }: HomeProps) {
   const backButton = history.length > 0 ? (
     <button
       onClick={handleBack}
-      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center gap-2 transition-colors"
+      className="px-6 py-3 bg-gradient-to-r from-primary-purple to-primary-pink 
+                text-white rounded-xl flex items-center gap-2 
+                transition-all duration-300 shadow-glow-sm
+                hover:shadow-glow hover:-translate-y-1
+                focus:outline-none focus:ring-2 focus:ring-primary-pink/50
+                active:scale-95 group"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        className="h-5 w-5 transition-transform duration-300 transform group-hover:-translate-x-1" 
+        viewBox="0 0 20 20" 
+        fill="currentColor"
+      >
         <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
       </svg>
-      Back
+      <span>Back</span>
     </button>
   ) : null;
 
   return (
-    <main className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        Search Pokémon
-      </h1>
-      
-      <div className="flex gap-4 items-center mb-6">
-        <div className="flex-shrink-0">
-          {backButton}
+    <main className="min-h-screen">
+      <div className="container mx-auto px-4 py-16 max-w-7xl">
+        <div className="text-center mb-16 space-y-6 animate-float">
+          <div className="relative inline-block">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary-purple to-primary-pink rounded-2xl blur opacity-25 group-hover:opacity-40 transition-all duration-300 animate-pulse"></div>
+            <h1 className="relative text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-purple to-primary-pink animate-shine">
+              Search Pokémon
+            </h1>
+          </div>
+          <p className="text-gray-300 text-xl font-medium">
+            Discover detailed information about your favorite Pokémon
+          </p>
         </div>
-        {searchBox}
-      </div>
+        
+        <div className="flex gap-4 items-center mb-12 animate-float" style={{ animationDelay: '0.1s' }}>
+          <div className="flex-shrink-0">
+            {backButton}
+          </div>
+          {searchBox}
+        </div>
       
-      {!searchedPokemon ? (
-        <p className="text-center text-gray-600">
-          Enter a Pokémon name to see its details
-        </p>
-      ) : (
-        <div className="relative">
-          <PokemonInfo 
-            key={searchedPokemon} // Force remount on new search
-            name={searchedPokemon} 
-            onSelectEvolution={handleSearch} 
-          />
-          <div 
-            className="absolute inset-0 flex items-center justify-center bg-white/80"
-            style={{ 
-              display: searchedPokemon ? 'none' : 'flex',
-              animation: 'fadeIn 0.3s ease-in-out'
-            }}
-          >
-            <div className="text-center p-4 bg-yellow-50 rounded-lg shadow-lg">
-              <h2 className="text-xl font-semibold text-yellow-700 mb-2">
-                ไม่พบโปเกม่อน
-              </h2>
-              <p className="text-yellow-600">
-                กรุณาลองค้นหาใหม่อีกครั้ง
+        {!searchedPokemon ? (
+          <div className="text-center py-16 bg-gray-800/30 backdrop-blur-lg rounded-2xl border border-primary-purple/20 shadow-glow transition-all duration-300 hover:shadow-glow-lg">
+            <div className="max-w-md mx-auto">
+              <img 
+                src="/pokeball.png" 
+                alt="Pokeball" 
+                className="w-32 h-32 mx-auto mb-8 opacity-50 animate-float"
+              />
+              <p className="text-xl text-gray-300 font-medium">
+                Enter a Pokémon name above to see detailed information
               </p>
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="relative backdrop-blur-sm">
+            <PokemonInfo 
+              key={searchedPokemon} // Force remount on new search
+              name={searchedPokemon} 
+              onSelectEvolution={handleSearch} 
+            />
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-gray-800/90"
+              style={{ 
+                display: searchedPokemon ? 'none' : 'flex',
+                animation: 'fadeIn 0.3s ease-in-out'
+              }}
+            >
+              <div className="text-center p-6 bg-gray-800/50 backdrop-blur-lg rounded-xl border border-red-500/30 shadow-glow">
+                <h2 className="text-2xl font-semibold text-red-400 mb-3">
+                  ไม่พบโปเกม่อน
+                </h2>
+                <p className="text-lg text-gray-300">
+                  กรุณาลองค้นหาใหม่อีกครั้ง
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </main>
