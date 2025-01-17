@@ -4,7 +4,12 @@ import { useQuery } from '@apollo/client';
 import { GET_POKEMON } from '../graphql/queries';
 import { FastAttack, Evolution } from '../graphql/types';
 
-const PokemonInfo = ({ name }: { name: string }) => {
+interface PokemonInfoProps {
+  name: string;
+  onSelectEvolution: (name: string) => void;
+}
+
+const PokemonInfo = ({ name, onSelectEvolution }: PokemonInfoProps) => {
   const { data, loading, error } = useQuery(GET_POKEMON, {
     variables: { name },
   });
@@ -39,7 +44,16 @@ const PokemonInfo = ({ name }: { name: string }) => {
         {pokemon.evolutions?.length ? (
           <ul className="space-y-1">
             {pokemon.evolutions.map((evo: Evolution) => (
-              <li key={evo.name} className="text-blue-500">{evo.name}</li>
+              <li 
+                key={evo.name} 
+              >
+                <span 
+                  className="text-blue-600 hover:text-blue-800 cursor-pointer hover:underline"
+                  onClick={() => onSelectEvolution(evo.name)}
+                >
+                  {evo.name}
+                </span>
+              </li>
             ))}
           </ul>
         ) : (
