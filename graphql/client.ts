@@ -2,20 +2,10 @@ import { ApolloClient, InMemoryCache, defaultDataIdFromObject } from '@apollo/cl
 
 const cache = new InMemoryCache({
   typePolicies: {
-    Pokemon: {
-      // Unique identifier for Pokemon type
-      keyFields: ['id', 'name'],
+    Query: {
       fields: {
-        // Field-level policies
-        types: {
-          // Array fields should be merged rather than overwritten
-          merge: true,
-        },
-        attacks: {
-          merge: true,
-        },
-        evolutions: {
-          merge: true,
+        pokemon: {
+          merge: false,
         },
       },
     },
@@ -27,12 +17,11 @@ const client = new ApolloClient({
   cache,
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'network-only', // Always fetch fresh data
       nextFetchPolicy: 'cache-first',
     },
     query: {
-      fetchPolicy: 'cache-first',
-      // Retry failed requests
+      fetchPolicy: 'network-only',
       errorPolicy: 'all',
     },
   },
