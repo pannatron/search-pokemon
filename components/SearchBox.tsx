@@ -4,10 +4,11 @@ import { useState } from 'react';
 
 interface SearchBoxProps {
   onSearch: (value: string) => void;
+  initialValue: string;
 }
 
-export default function SearchBox({ onSearch }: SearchBoxProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function SearchBox({ onSearch, initialValue }: SearchBoxProps) {
+  const [searchTerm, setSearchTerm] = useState(initialValue);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
