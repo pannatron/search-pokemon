@@ -17,11 +17,11 @@ const client = new ApolloClient({
   cache,
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'network-only', // Always fetch fresh data
+      fetchPolicy: 'cache-first', 
       nextFetchPolicy: 'cache-first',
     },
     query: {
-      fetchPolicy: 'network-only',
+      fetchPolicy: 'cache-first',
       errorPolicy: 'all',
     },
   },
